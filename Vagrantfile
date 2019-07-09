@@ -5,6 +5,7 @@ Vagrant.configure("2") do |config|
   config.vm.box_check_update = false
   config.vm.provider 'virtualbox' do |vb|
    vb.customize [ "guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 1000 ]
+  config.vm.synced_folder ".", "/vagrant", type: "nfs", nfs_udp: false
   end
 
   $num_instances = 3
@@ -28,6 +29,12 @@ Vagrant.configure("2") do |config|
   config.ssh.username = "root"
   config.ssh.password = "vagrant"
   config.ssh.insert_key = "true"
+
+  if Vagrant.has_plugin?("vagrant-proxyconf")
+    config.proxy.http     = "http://10.0.2.2:1087/"
+    config.proxy.https    = "http://10.0.2.2:1087/"
+    config.proxy.no_proxy = "localhost,127.0.0.1,.example.com"
+  end
 
   config.vm.provision "bootstrap", type: "shell",
     inline: $bootstrap
