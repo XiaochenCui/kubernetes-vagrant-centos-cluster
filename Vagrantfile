@@ -31,9 +31,10 @@ Vagrant.configure("2") do |config|
   config.ssh.insert_key = "true"
 
   if Vagrant.has_plugin?("vagrant-proxyconf")
-    config.proxy.http     = "http://10.0.2.2:1087/"
-    config.proxy.https    = "http://10.0.2.2:1087/"
-    config.proxy.no_proxy = "localhost,127.0.0.1,.example.com"
+    config.proxy.enabled = false
+    config.proxy.http     = ""
+    config.proxy.https    = ""
+    config.proxy.no_proxy = ""
   end
 
   config.vm.provision "bootstrap", type: "shell",
@@ -41,6 +42,9 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "toolkit", type: "shell",
     inline: $toolkit
+
+  config.vm.provision "python", type: "shell",
+    inline: $python
 
 end
 
@@ -76,5 +80,13 @@ mv go /usr/local
 echo "" > ~/.localrc
 echo "\nexport GOROOT=/usr/local/go" >> ~/.localrc
 echo "export PATH=$GOROOT/bin:$PATH" >> ~/.localrc
+
+SCRIPT
+
+$python = <<SCRIPT
+
+yum install -y https://centos7.iuscommunity.org/ius-release.rpm
+yum -y update
+yum install -y python36u python36u-libs python36u-devel python36u-pip
 
 SCRIPT
